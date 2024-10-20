@@ -49,20 +49,24 @@ The difficulty is caused by the nature of Java. In most languages, code is compi
 
 Add the following code inside your class. This approach is meant to make later code a bit easier to follow. If you later choose to use different images for your project, you'll have all these references in one place.
 ```
-    // collecting images here - if you change pictures, have them all in the resources folder
-    ImageIcon BLANK = new ImageIcon(RPS.class.getClassLoader().getResource("blank.png"));
-    ImageIcon LEFTROCK = new ImageIcon(RPS.class.getClassLoader().getResource("leftrock.png"));
-    ImageIcon LEFTPAPER = new ImageIcon(RPS.class.getClassLoader().getResource("leftpaper.png"));
-    ImageIcon LEFTSCISSORS = new ImageIcon(RPS.class.getClassLoader().getResource("leftscissors.png"));
-    ImageIcon RIGHTROCK = new ImageIcon(RPS.class.getClassLoader().getResource("rightrock.png"));
-    ImageIcon RIGHTPAPER = new ImageIcon(RPS.class.getClassLoader().getResource("rightpaper.png"));
-    ImageIcon RIGHTSCISSORS = new ImageIcon(RPS.class.getClassLoader().getResource("rightscissors.png"));
+// collecting images here - if you change pictures, have them all in the resources folder
+ImageIcon BLANK = new ImageIcon(RPS.class.getClassLoader().getResource("blank.png"));
+ImageIcon LEFTROCK = new ImageIcon(RPS.class.getClassLoader().getResource("leftrock.png"));
+ImageIcon LEFTPAPER = new ImageIcon(RPS.class.getClassLoader().getResource("leftpaper.png"));
+ImageIcon LEFTSCISSORS = new ImageIcon(RPS.class.getClassLoader().getResource("leftscissors.png"));
+ImageIcon RIGHTROCK = new ImageIcon(RPS.class.getClassLoader().getResource("rightrock.png"));
+ImageIcon RIGHTPAPER = new ImageIcon(RPS.class.getClassLoader().getResource("rightpaper.png"));
+ImageIcon RIGHTSCISSORS = new ImageIcon(RPS.class.getClassLoader().getResource("rightscissors.png"));
+
+ImageIcon[] computerChoices = {RIGHTROCK, RIGHTPAPER, RIGHTSCISSORS};
 ```
 If you view the images, you'll see that the left & right plays are facing one another to make it look more "real". Thus having names referring to left & right makes sense. These were all clipped from rockpaperscissors.jpg, which I found from a search on images.google.com.
 
 The complicated code is worth understanding. RPS is the class we are currently working on. As such, any class will read out its path (where it is on your computer) by using ClassName.class.getClassLoader(). Since we want something in the resource directory, we add .getResource("imagefile.png"). We'll use this sort of approach again later.
 
 This simplifies a lot of things. Look through your device and figure out where you saved your repo. Then do the same for the person to your left and the one to your right. Unless you're identical twins using identical devices and taking all the same classes, those were almost undoubtedly three different paths! Not to mention dealing with both Mac & Windows.
+
+For later use, we declare an array of image icons here to avoid waste of resources in the listener object.
 
 ## Adding Fields
 
@@ -79,8 +83,10 @@ private JButton paperButton;
 private JButton scissorsButton;
 
 private JButton resetButton;        // clear plays
+
+Random random = new Random(); // common randomizer
 ```
-With the screenshot in mind, these should all make sense. We need them to be available to both the constructor and the listener for the buttons, so we declare them outside either.
+With the screenshot in mind, these should all make sense. We need them to be available to both the constructor and the listener for the buttons, so we declare them outside either. The randomizer only appears in the listener, but we don't want to re-instantiate the resource repeatedly for use of resources and certain oddities of random number generation.
 
 ## Make the Constructor
 
@@ -121,7 +127,7 @@ computerIconLabel.setOpaque(true);
 playerLabel = new JLabel("Player", SwingConstants.CENTER);
 computerLabel = new JLabel("Computer", SwingConstants.CENTER);
 ```
-The icon labels will display the pictures of rock, paper, or scissors, but are initially blank. The other labels help the player know which play is theirs. SwingConstants.CENTER is an option that tells the label to center its contents.
+The icon labels will display the pictures of rock, paper, or scissors, but are initially blank. The other labels help the player know which play is theirs. SwingConstants.CENTER is an option that tells the label to center its contents. 
 
 At this point, your code should compile, but won't do anything because we haven't added anything to the frame.
 
@@ -189,8 +195,6 @@ private class ButtonClickListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         // randomize computer choice
-        ImageIcon[] computerChoices = {RIGHTROCK, RIGHTPAPER, RIGHTSCISSORS};
-        Random random = new Random();
         ImageIcon computerChoice = computerChoices[random.nextInt(computerChoices.length)];
         
         if (e.getSource() == rockButton) {
@@ -209,3 +213,38 @@ private class ButtonClickListener implements ActionListener {
     }
 }
 ```
+As in the coin flip example, we create a private class implementing ActionListener - specifically meant to interact with buttons & textfields - that will run when any of the buttons is clicked.
+
+The randomizer generates a number 0 to 2, and this icon is chosen for the computer's play. Since all we're doing is displaying, we don't need anything more complicated than this.
+
+Here we get to see a nice trick. Since this is a listener for four different buttons, we need to know which caused the event. We could also have handled this by creating four separate private classes, but this is considerably more readable. Since each button is an object, e.getSource() will match whichever one sent it, so we can use the if / else structure to run different code.
+
+Note that each is very similar. We set the icon for the player's label to the appropriate image, then we set the computer label's icon to the random choice made earlier.
+
+It would be worthwhile to test run your code now, even though it doesn't do anything. This is just to spot any copying errors you may have made.
+
+## Connecting the Butttons to the Listener
+
+At this point, you have all the pieces, but they don't talk to each other. Add the following code to the constructor after the line that added buttonPanel, but before the visibility line. 
+```
+// Add action listeners to buttons
+rockButton.addActionListener(new ButtonClickListener());
+paperButton.addActionListener(new ButtonClickListener());
+scissorsButton.addActionListener(new ButtonClickListener());
+resetButton.addActionListener(new ButtonClickListener());
+```
+An oddity here is that each new ButtonClickListener() will create a separate location in memory. This is the reason we avoided declaring variables in that class or creating a randomizer. This is unlikely to be a problem for our tiny application, but consider a bigger project with multiple stages, like tax preparation software. There might be hundreds of buttons and relatively large image files being dealt with.
+
+At this point, your program should function. It doesn't decide who the winner is, but it throws against you and lets you clear the board.
+
+## Further Work
+
+You'll probably notice the image background doesn't match the panels. Consider using setBackground(Color.WHITE) to fix this.
+
+If you're interested, you could expand this. If you create another label for the NORTH pane, you can write code inside each if clause to say things like "Paper covers rock, you win!" and "Rock breaks scissors, you lose!" and "Scissors vs. scissors - a draw!". Don't forget to set the text of the label to the empty string if the reset button is pressed, though!
+
+The images I chose are pretty basic. If you can find some nicer ones, it would be great. And I didn't make a great effort to get a pleasing color scheme - just basic gray. Exercise your creativity!
+
+## Wrapping Up
+
+You know the refrain. Save. Stage. Commit message. Commit button. Sync button. Screenshot & repo URL to Canvas.
