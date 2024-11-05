@@ -27,6 +27,8 @@ Keeping an idea of what we're heading towards will help us.
 
 I named mine RPS and will work with that name going forward. I suggest you do the same. You've done this part multiple times.
 
+Don't forget to comment your name in the top matter!
+
 ## Imports
 
 We'll use the following imports in this project. 
@@ -43,7 +45,7 @@ None of these should be new to you!
 
 Your repo will come with the image files `blank.png`, `leftpaper.png`, etc. saved in your `resource` folder. This is standard practice in Java - any files that are not Java code is saved in this folder. Unfortunately, reference to these files in any context is pretty arcane, but putting them in the resources folder makes it at least understandable.
 
-The difficulty is caused by the nature of Java. In most languages, code is compiled by a compiler completely set up for the particular machine it's on (if this doesn't match your experience with video games, suffice to say I'm avoiding a lot of detail here). Java instead works with something called the "Java Virtual Machine" that makes the same code run on any platform. Consequently, as your code is compiled, a copy is made... somewhere. We have to trust the Virtual Machine to handle the location of resources in a consistent manner.
+One difficulty is caused by the nature of Java. In most languages, code is compiled by a compiler completely set up for the particular machine it's on (if this doesn't match your experience with video games, suffice to say I'm avoiding a lot of detail here). Java instead works with something called the "Java Virtual Machine" that makes the same code run on any platform. Consequently, as your code is compiled, a copy is made... somewhere. We have to trust the Virtual Machine to handle the location of resources in a consistent manner.
 
 ## Adding References to Your Files
 
@@ -64,7 +66,7 @@ If you view the images, you'll see that the left & right plays are facing one an
 
 The complicated code is worth understanding. RPS is the class we are currently working on. As such, any class will read out its path (where it is on your computer) by using ClassName.class.getClassLoader(). Since we want something in the resource directory, we add .getResource("imagefile.png"). We'll use this sort of approach again later.
 
-This simplifies a lot of things. Look through your device and figure out where you saved your repo. Then do the same for the person to your left and the one to your right. Unless you're identical twins using identical devices and taking all the same classes, those were almost undoubtedly three different paths! Not to mention dealing with both Mac & Windows.
+This simplifies a lot of things. Look through your device and figure out where you saved your repo. Then do the same for the person to your left and the one to your right. Unless you're identical triplets using identical devices and taking all the same classes, those were almost undoubtedly three different paths! Not to mention dealing with both Mac & Windows.
 
 For later use, we declare an array of image icons here to avoid waste of resources in the listener object.
 
@@ -74,9 +76,6 @@ After the file names, add the following code.
 ```
 private JLabel playerIconLabel;     // used for pictures
 private JLabel computerIconLabel;
-
-private JLabel playerLabel;         // used for labels
-private JLabel computerLabel;
 
 private JButton rockButton;         // play buttons
 private JButton paperButton;
@@ -90,9 +89,7 @@ With the screenshot in mind, these should all make sense. We need them to be ava
 
 ## Make the Constructor
 
-Don't bother having VSCode do this for you! The way you'll add it is sufficiently convoluted to make that pointless. This is because we want to make the interface look a particular way.
-
-Start by adding a basic constructor.
+Don't bother having VSCode do this for you! The way you'll add it is sufficiently convoluted to make that pointless. Start by adding a basic constructor.
 ```
 public RPS() {
     setTitle("Rock Paper Scissors");
@@ -106,7 +103,7 @@ public RPS() {
 ```
 You've seen this in past projects. We want to keep the visibility statement as the last of the constructor. All the constructor code will be inserted between the layout and visibility lines.
 
-## Create `main` Method
+## Create *main* Method
 
 In the class after the constructor but still inside the class, insert a main method. The only statement inside main should be `new RPS();`. All this will do is instantiate an object from the class. This is always necessary.
 
@@ -116,6 +113,10 @@ You should be able to test run your program at this point.
 
 Insert the following code into the constructor between the layout and visibility lines.
 ```
+// used for labels
+private JLabel playerLabel = new JLabel("Player", SwingConstants.CENTER);
+private JLabel computerLabel = new JLabel("Computer", SwingConstants.CENTER);
+
 // Initialize labels with icons
 playerIconLabel = new JLabel(BLANK);
 playerIconLabel.setOpaque(true);
@@ -123,11 +124,8 @@ playerIconLabel.setOpaque(true);
 computerIconLabel = new JLabel(BLANK);
 computerIconLabel.setOpaque(true);
 
-// Initialize text labels
-playerLabel = new JLabel("Player", SwingConstants.CENTER);
-computerLabel = new JLabel("Computer", SwingConstants.CENTER);
 ```
-The icon labels will display the pictures of rock, paper, or scissors, but are initially blank. The other labels help the player know which play is theirs. SwingConstants.CENTER is an option that tells the label to center its contents. 
+The icon labels will display the pictures of rock, paper, or scissors, but are initially blank. The other labels help the player know which play is theirs. SwingConstants.CENTER is an option that tells the label to center its contents. The setOpaque(true) will make labels that are transparent to their backgrounds not transparent. If you find new icons that are transparent, comment these lines out.
 
 At this point, your code should compile, but won't do anything because we haven't added anything to the frame.
 
@@ -136,33 +134,33 @@ At this point, your code should compile, but won't do anything because we haven'
 These visual items could be added to the frame directly, but the display would look awful. In order to organize, we're going to make a center panel and add a left and right panel to it. Add the following code after the instantiation of the text labels but before the visibility line.
 ```
 // Create center panel for labels
-JPanel centerPanel = new JPanel();
-centerPanel.setLayout(new GridLayout(1, 2));
+JPanel displayPanel = new JPanel();
+displayPanel.setLayout(new GridLayout(1, 2));
 
 JPanel leftPanel = new JPanel(new BorderLayout());
 leftPanel.add(playerIconLabel,BorderLayout.CENTER);
 leftPanel.add(playerLabel, BorderLayout.SOUTH);
-centerPanel.add(leftPanel);
+displayPanel.add(leftPanel);
 
 JPanel rightPanel = new JPanel(new BorderLayout());
 rightPanel.add(computerIconLabel, BorderLayout.CENTER);
 rightPanel.add(computerLabel, BorderLayout.SOUTH);
-centerPanel.add(rightPanel);
+displayPanel.add(rightPanel);
 
 // Add panel to frame
-add(centerPanel, BorderLayout.CENTER);
+add(displayPanel, BorderLayout.CENTER);
 ```
-Note centerPanel is really just a placeholder. It has one row and two columns - each space gets a panel of its own.
+Note displayPanel is really just a placeholder. It has one row and two columns - each space gets a panel of its own.
 
 Then leftPanel gets a border layout so the icon label in the CENTER can be large while the label in the SOUTH will be relatively small. If we had used a grid layout for this panel, it would have made the two labels the same size, which wouldn't look very good. Both of these represent the player.
 
-The rightPanel is identical, but represents the computer. Then both panels are added to centerPanel. And centerPanel gets added to the frame - notice the frame has no need for a name here, it's just the object we're adding things to.
+The rightPanel is identical, but represents the computer. Both panels are added to displayPanel. And displayPanel gets added to the frame - notice the frame has no need for a name here, it's just the object holding the displayPanel.
 
 At this point, you should be able to test run your code. It lacks buttons, of course, but it should give you a rough impression of how the finished product will look. You might change BLANK to LEFTROCK on them to see how those images will appear. Change them back after, though!
 
 ## Adding the Button Panel
 
-Let's add the buttons to the frame before we actually make them function. Place this after the line that added centerPanel but before the visibility line.
+Let's add the buttons to the frame before we actually make them function. Place this after the line that added displayPanel but before the visibility line.
 ```
 // Initialize buttons
 rockButton = new JButton("Rock");
@@ -170,7 +168,7 @@ paperButton = new JButton("Paper");
 scissorsButton = new JButton("Scissors");
 resetButton = new JButton("Reset");
 
-// Create panel for buttons with 4x1 grid layout
+// Create panel for buttons with 1x4 grid layout
 JPanel buttonPanel = new JPanel();
 buttonPanel.setLayout(new GridLayout(1, 4));
 
@@ -213,11 +211,11 @@ private class ButtonClickListener implements ActionListener {
     }
 }
 ```
-As in the coin flip example, we create a private class implementing ActionListener - specifically meant to interact with buttons & textfields - that will run when any of the buttons is clicked.
+As in the coin flip example, we create a private class implementing ActionListener - specifically meant to interact with buttons & textfields - that will run when any of the buttons is clicked. Notice that here we're giving the private class a name - some practice would make such a private class "anonymous", but the logic is harder to follow when you do that.
 
-The randomizer generates a number 0 to 2, and this icon is chosen for the computer's play. Since all we're doing is displaying, we don't need anything more complicated than this.
+The randomizer generates a number 0 to 2, and this icon is chosen for the computer's play. Since all we're doing is displaying, we don't need anything more complicated than this. Notice that this avoids a complicated if / else or switch structure.
 
-Here we get to see a nice trick. Since this is a listener for four different buttons, we need to know which caused the event. We could also have handled this by creating four separate private classes, but this is considerably more readable. Since each button is an object, e.getSource() will match whichever one sent it, so we can use the if / else structure to run different code.
+Here we get to see a nice trick. Since this is a listener for four different buttons, we need to know which caused the event. We could also have handled this by creating four separate private classes, but this is  more readable. Since each button is an object, e.getSource() will match whichever one sent it, so we can use the if / else structure to run different code.
 
 Note that each is very similar. We set the icon for the player's label to the appropriate image, then we set the computer label's icon to the random choice made earlier.
 
@@ -237,11 +235,13 @@ An oddity here is that each new ButtonClickListener() will create a separate loc
 
 At this point, your program should function. It doesn't decide who the winner is, but it throws against you and lets you clear the board.
 
-## Further Work
+## Embellishments
 
-You'll probably notice the image background doesn't match the panels. Consider using setBackground(Color.WHITE) to fix this.
+If you have time, try this: rather than creating a new ButtonListener for each button, declare a single button listener, then add it to each button. This saves a little bit of computer memory - you'll never notice it on small applications, but it can make a difference for large ones.
 
-If you're interested, you could expand this. If you create another label for the NORTH pane, you can write code inside each if clause to say things like "Paper covers rock, you win!" and "Rock breaks scissors, you lose!" and "Scissors vs. scissors - a draw!". Don't forget to set the text of the label to the empty string if the reset button is pressed, though!
+You'll probably notice the image background doesn't match the panels. Consider using setBackground(Color.WHITE) to fix this. Or, if you have access to image editing software, paint the png files to match whatever background you want.
+
+If you're interested, you could expand the app. If you create another label for the NORTH pane, you can write code inside each if clause to say things like "Paper covers rock, you win!" and "Rock breaks scissors, you lose!" and "Scissors vs. scissors - a draw!". It will require a 3 possibility if / else or switch in each case... Don't forget to set the text of the label to the empty string if the reset button is pressed, though!
 
 The images I chose are pretty basic. If you can find some nicer ones, it would be great. And I didn't make a great effort to get a pleasing color scheme - just basic gray. Exercise your creativity!
 
