@@ -1,0 +1,1 @@
+Project for students to learn use of buttons, images. Randomizes the computer play of rock / paper / scissors. Introduces `getClass().getResource("/image.png")`, uses `e.getSource()` to implement a single listener for multiple buttons. Suggests determining winner using past code ideas.
